@@ -1,6 +1,7 @@
-//crea un login con firebase
 import { useState } from 'react';
-import { useAuth } from '../../context/AuthContext';
+import { useNavigate } from 'react-router-dom';
+import { signInWithEmailAndPassword } from 'firebase/auth';
+import { auth } from '../../firebase/Firebase';
 import logo from '../../assets/images/logo.png'; 
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faEnvelope, faLock } from '@fortawesome/free-solid-svg-icons';
@@ -8,12 +9,14 @@ import { faEnvelope, faLock } from '@fortawesome/free-solid-svg-icons';
 const Login = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const { login } = useAuth();
+
+  const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      await login(email, password);
+      await signInWithEmailAndPassword(auth, email, password);
+      navigate('/');
     } catch (error) {
       console.error('Error logging in:', error);
     }
@@ -61,7 +64,6 @@ const Login = () => {
                             ¿No tienes cuenta? Regístrate
                         </a>
                     </div>
-                
                 </form>
             </div>
         </div>
