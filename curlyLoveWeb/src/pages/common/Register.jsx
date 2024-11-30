@@ -29,6 +29,21 @@ const Register = () => {
             return;
         }
 
+        if (password.length < 6) {
+            setError('La contraseña debe tener al menos 6 caracteres.');
+            return;
+        }
+
+        if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+            setError('El correo no es válido.');
+            return;
+        }
+
+        if (!/^[0-9]{4}[\s][0-9]{4}$/.test(phoneNumber)) {
+            setError('El número de teléfono no es válido. Debe tener el formato #### ####.');
+            return;
+        }
+
         try {
             const resp = await createUserWithEmailAndPassword(auth, email, password);
 
@@ -39,6 +54,7 @@ const Register = () => {
                 email,
                 address,
                 phoneNumber,
+                role: 'client',
             };
 
             await setDoc(doc(db, 'users', resp.user.uid), user);
