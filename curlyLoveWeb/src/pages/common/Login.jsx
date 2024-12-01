@@ -9,16 +9,18 @@ import { faEnvelope, faLock } from '@fortawesome/free-solid-svg-icons';
 const Login = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-
+  const [error, setError] = useState('');
   const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setError('');
     try {
-      await signInWithEmailAndPassword(auth, email, password);
-      navigate('/');
+        await signInWithEmailAndPassword(auth, email, password);
+        navigate('/');
     } catch (error) {
-      console.error('Error logging in:', error);
+        setError('Correo o contraseña incorrectos. Por favor, inténtelo de nuevo.');
+        console.error('Error logging in:', error);
     }
   };
 
@@ -32,6 +34,7 @@ const Login = () => {
         <div className="flex items-center justify-center w-1/3 bg-white p-8">
             <div className="bg-white p-8 rounded w-full max-w-md ">
                 <h1 className="text-2xl font-bold mb-12 text-left">Iniciar Sesión</h1>
+                {error && <p className="text-red-500 mb-4">{error}</p>}
                 <form onSubmit={handleSubmit}>
                     <label htmlFor="email" className="text-sm font-semibold">
                         Correo
