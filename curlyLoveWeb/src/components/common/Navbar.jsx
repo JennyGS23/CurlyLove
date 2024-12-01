@@ -18,9 +18,10 @@ const Navbar = () => {
     };
 
     return (
-        <nav className="fixed top-0 left-0 right-0 flex justify-between items-center p-4 bg-primary  shadow-md">
+        <nav className="top-0 left-0 right-0 flex justify-between items-center p-4 bg-primary  shadow-md">
             <div className="flex items-center">
-                <img src={logo} alt="Logo" className="w-16 h-13 ml-6 mr-4 rounded-xl" />
+                <img src={logo} alt="Logo" className="w-16 h-13 ml-6 mr-6 rounded-xl" />
+                <h1 className="text-white text-2xl font-bold">Curly&Love23</h1>
             </div>
             <div className="flex items-center">
                 <button onClick={() => navigate('/cart')} className="py-2 px-3 rounded transform transition-transform duration-200 hover:scale-110">

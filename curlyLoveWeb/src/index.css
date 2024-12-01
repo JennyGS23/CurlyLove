@@ -38,3 +38,8 @@
 .text-primary {
     color: #25A59A;
 }
+
+.bg-yellow {
+    background-color: #FFCC15;
+    color: #fff;
+}

@@ -15,12 +15,6 @@ const Register = () => {
     const [error, setError] = useState('');
     const navigate = useNavigate();
 
-    const handlePhotoChange = (e) => {
-        if (e.target.files[0]) {
-            setPhoto(e.target.files[0]);
-        }
-    };
-
     const handleSubmit = async (e) => {
         e.preventDefault();
 
