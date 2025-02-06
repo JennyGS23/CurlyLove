@@ -33,10 +33,10 @@ const Register = () => {
             return;
         }
 
-        if (!/^[0-9]{4}[\s][0-9]{4}$/.test(phoneNumber)) {
-            setError('El número de teléfono no es válido. Debe tener el formato #### ####.');
+        if (!/^[0-9]{4}\s?[0-9]{4}$/.test(phoneNumber)) {
+            setError('El número de teléfono no es válido. Debe tener el formato #### #### o ########.');
             return;
-        }
+        }        
 
         try {
             const resp = await createUserWithEmailAndPassword(auth, email, password);
