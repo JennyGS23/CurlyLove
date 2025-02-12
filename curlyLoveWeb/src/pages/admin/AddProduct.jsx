@@ -1,31 +1,80 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Navbar from "../../components/common/Navbar";
 import Footer from "../../components/common/Footer";
+import EditCategory from "./EditCategory";
+import EditBrand from "./EditBrand";
 import { db } from '../../firebase/Firebase';
-import { setDoc, doc, getDoc } from "firebase/firestore";
+import {collection, setDoc, doc, getDoc, onSnapshot } from "firebase/firestore";
+
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import {faPlus, faPenToSquare } from '@fortawesome/free-solid-svg-icons';
 
 const AddProduct = () => {
+    const [categories, setCategories] = useState([]);
     const [category, setCategory] = useState('');
     const [name, setName] = useState('');
     const [cost, setCost] = useState('');
     const [grams, setGrams] = useState('');
+    const [brands, setBrands] = useState([]);
+    const [brand, setBrand] = useState('');
     const [description, setDescription] = useState('');
     const [error, setError] = useState('');
-    const [success, setSuccess] = useState(false);
     const [unit, setUnit] = useState('g'); 
+    const [image, setImage] = useState(null);
 
-    const categories = ['Skala', 'duos', 'Cremas', 'Shampoo'];//cambiar a las categorias que se tengan en la base de datos
+
+    const [success, setSuccess] = useState(false);
+    const [isModalCategory, setIsModalCategory] = useState(false);
+    const [isModalBrand, setIsModalBrand] = useState(false);
     
+    useEffect(() => {
+        const unsubscribe = onSnapshot(collection(db, "Category"), (snapshot) => {
+          const categoryList = snapshot.docs.map((doc) => ({
+            id: doc.id,
+            ...doc.data(),
+          }));
+          setCategories(categoryList);
+        });
+        return () => unsubscribe(); 
+    }, []);
+
+    useEffect(() => {
+        const unsubscribe = onSnapshot(collection(db, "Brand"), (snapshot) => {
+          const brandList = snapshot.docs.map((doc) => ({
+            id: doc.id,
+            ...doc.data(),
+          }));
+          setBrands(brandList);
+        });
+        return () => unsubscribe(); 
+    }, []);
+
+
+    const handleImage = (e) => {
+        const file = e.target.files[0];
+
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                setImage(reader.result);
+            };
+            reader.readAsDataURL(file);
+        }
+    };
 
     const handleSubmit = async (e) => {
         e.preventDefault();
 
-        if (!category || !name || !cost || !grams || !description) {
+        if (!category || !name || !cost || !grams || !brand || !description) {
             setError('Todos los campos son obligatorios para realizar el registro.');
             return;
         }
         if (isNaN(cost) || isNaN(grams)) {
             setError('El costo y los gramos deben ser solo valores numéricos.');
+            return;
+        }
+        if (image === null) {
+            setError('Por favor, agrega una imagen para el producto.');
             return;
         }
         
@@ -45,7 +94,9 @@ const AddProduct = () => {
                 name,
                 cost: `₡${cost}`,
                 grams: `${grams}${unit}`,
+                brand,
                 description,
+                image,
             };
 
             await setDoc(productRef, product);
@@ -55,7 +106,10 @@ const AddProduct = () => {
             setCost('');
             setGrams('');
             setDescription('');
+            setImage(null);
+            setError('');
             setSuccess(true); 
+            
            
         }
 
@@ -72,16 +126,25 @@ const AddProduct = () => {
                     <h1 className="text-2xl font-bold mb-6">Agregar Nuevo Producto</h1>
                     <form className="space-y-4" onSubmit={handleSubmit}>
                         <label htmlFor="category" className="block font-medium">Categoría</label>
-                        <select
-                            value={category}
-                            onChange={(e) => setCategory(e.target.value)}
-                            className="p-2 mt-1 block w-9/12 rounded-md bg-boneWhite shadow-sm focus:ring-2"
-                        >
-                            <option value="">Selecciona una categoría</option>
-                            {categories.map((cat) => (
-                                <option key={cat} value={cat}>{cat}</option>
-                            ))}
-                        </select>
+                        <div className='flex items-center space-x-2'>
+                            <select className="p-2 mt-1 block w-7/12 rounded-md bg-boneWhite shadow-sm focus:ring-2">
+                                <option value="">Selecciona una categoría</option>
+                                {categories.map((category) => (
+                                <option key={category.id} value={category.name}>
+                                    {category.name}
+                                </option>
+                                ))}
+                            </select>
+                            <button 
+                                type='button'
+                                onClick={() => setIsModalCategory(true)}
+                                className="px-4 py-2 bg-yellow rounded-md font-medium hover:bg-yellow-600"
+                            >
+                                <FontAwesomeIcon icon={faPenToSquare}/>
+                            </button>
+                            {isModalCategory && <EditCategory onClose={() => setIsModalCategory(false)} />}
+                        </div>
+                        
                             
                                               
                         <label htmlFor="name" className="block font-medium ">Nombre del Producto</label>
@@ -90,7 +153,7 @@ const AddProduct = () => {
                             value={name}
                             onChange={(e) => setName(e.target.value)}
                             placeholder="Producto1"
-                            className="p-2 mt-1 block w-9/12 rounded-md bg-boneWhite shadow-sm focus:ring-2 "
+                            className="p-2 mt-1 block w-7/12 rounded-md bg-boneWhite shadow-sm focus:ring-2 "
                             />
                     
                         <label htmlFor="cost" className="block font-medium">Costo del Producto</label>
@@ -99,7 +162,7 @@ const AddProduct = () => {
                             value={cost}
                             onChange={(e) => setCost(e.target.value)}
                             placeholder="₡5000"
-                            className="p-2 mt-1 block w-4/12 rounded-md bg-boneWhite shadow-sm focus:ring-2 "
+                            className="p-2 mt-1 block w-7/12 rounded-md bg-boneWhite shadow-sm focus:ring-2 "
                         />
                     
                         <label htmlFor="grams" className="block font-medium">Peso</label>
@@ -109,18 +172,37 @@ const AddProduct = () => {
                                 value={grams}
                                 onChange={(e) => setGrams(e.target.value)}
                                 placeholder="500"
-                                className="p-2 mt-1 block w-4/12 rounded-md bg-boneWhite shadow-sm focus:ring-2"
+                                className="p-2 mt-1 block w-64 rounded-md bg-boneWhite shadow-sm focus:ring-2"
                             />
                             <select
                                 value={unit}
                                 onChange={(e) => setUnit(e.target.value)}
-                                className="p-2 mt-1 block w-2/12 rounded-md bg-boneWhite shadow-sm focus:ring-2"
+                                className="p-2 mt-1 block w-3/12 rounded-md bg-boneWhite shadow-sm focus:ring-2"
                             >
                                 <option value="g">g</option>
                                 <option value="kg">kg</option>
                             </select>
                         </div>
-                       
+
+                        <label htmlFor="brand" className="block font-medium">Marca</label>
+                        <div className='flex items-center space-x-2'>
+                        <select className="p-2 mt-1 block w-7/12 rounded-md bg-boneWhite shadow-sm focus:ring-2">
+                            <option value="">Selecciona una marca</option>
+                            {brands.map((brand) => (
+                            <option key={brand.id} value={brand.name}>
+                                {brand.name}
+                            </option>
+                            ))}
+                        </select>
+                            <button 
+                                type='button'
+                                onClick={() => setIsModalBrand(true)}
+                                className="px-4 py-2 bg-yellow rounded-md font-medium hover:bg-yellow-600"
+                            >
+                                <FontAwesomeIcon icon={faPenToSquare}/>
+                            </button>
+                            {isModalBrand&& <EditBrand onClose={() => setIsModalBrand(false)} />}
+                       </div>
                         <div>
                             <label htmlFor="description" className="block font-medium mt-16">Descripción del producto nuevo</label>
                             <textarea
@@ -144,13 +226,15 @@ const AddProduct = () => {
 
                 {/* Add photo */}
                 <div className="w-full md:w-1/3 flex flex-col items-center justify-center">
-                    <div className="flex items-center justify-center w-32 h-32 border-2 border-dashed border-[#25A59A] rounded-full cursor-pointer">
-                        <span className="text-xl font-bold ">+</span>
+                    <div className="flex items-center justify-center w-32 h-32 border-2 border-dashed border-[#25A59A] rounded-full cursor-pointer relative">
+                        <input type="file" accept="image/*" onChange={handleImage} className="absolute inset-0 opacity-0 cursor-pointer" />
+                        {image ? (
+                            <img src={image} alt="Vista previa" className="w-full h-full rounded-full object-cover" />
+                        ) : (
+                            <span><FontAwesomeIcon icon={faPlus} className='border-[#25A59A]'/></span>
+                        )}
                     </div>
                     <p className="mt-2 text-sm">Agrega foto del nuevo producto</p>
-                    {/* <button type="submit" className="mt-8 px-6 py-2 bg-yellow rounded-md font-medium hover:bg-yellow-600">
-                        Guardar Nuevo Producto
-                    </button> */}
                 </div>
             </div>
 
