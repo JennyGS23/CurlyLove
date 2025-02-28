@@ -1,4 +1,5 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect} from 'react';
+import { useNavigate } from "react-router-dom";
 import Navbar from '../../components/common/Navbar';
 import Footer from '../../components/common/Footer';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
@@ -8,7 +9,8 @@ import { db } from '../../firebase/Firebase';
 import {collection, onSnapshot } from "firebase/firestore";
 
 const ClientPrincipalPage = () => {
-   
+  
+  const navigate = useNavigate();
   const [category, setCategory] = useState('');
   const [categories, setCategories] = useState([]);
   const [products, setProducts] = useState([]);
@@ -46,7 +48,7 @@ const ClientPrincipalPage = () => {
 
   // Handle product click
   const handleProductClick = (productName) => {
-    window.open(`/description?product=${productName}`, '_blank');
+    navigate(`/description?product=${productName}`);
   };
 
   return (
