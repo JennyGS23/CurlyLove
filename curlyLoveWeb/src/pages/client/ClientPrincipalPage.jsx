@@ -38,12 +38,16 @@ const ClientPrincipalPage = () => {
     return () => unsubscribe(); 
   }, []);
 
-  // Filtrar productos por categoría y término de búsqueda
+  // Filter products by category and search term
   const filteredProducts = products.filter(product =>
     (category === '' || product.category === category) && 
     product.name.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
+  // Handle product click
+  const handleProductClick = (productName) => {
+    window.open(`/description?product=${productName}`, '_blank');
+  };
 
   return (
     <div >
@@ -82,10 +86,14 @@ const ClientPrincipalPage = () => {
             </select>
           </div>
 
-          {/* Listado de productos con el mismo ancho */}
+          {/* Products List */}
           <div className="grid grid-cols-4 gap-4 mt-10 mb-20">
                 {filteredProducts.map((product) => (
-                    <div key={product.id} className="border p-4 rounded-lg cursor-pointer hover:shadow-lg">
+                    <div 
+                      key={product.id} 
+                      className="border p-4 rounded-lg cursor-pointer hover:shadow-lg"
+                      onClick={() => handleProductClick(product.name)}
+                    >
                       <img src={product.image} alt={product.name} className="w-32 h-32 object-cover m-auto rounded-full" />
                       <div className='flex items-center'>
                         <h3 className="text-base font-bold">Nombre: </h3>
