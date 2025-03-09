@@ -65,10 +65,37 @@ const AddProduct = () => {
     const handleSubmit = async (e) => {
         e.preventDefault();
 
-        if (!category || !name || !cost || !grams || !brand || !description) {
-            setError('Todos los campos son obligatorios para realizar el registro.');
+        // if (!category || !name || !cost || !grams || !brand || !description) {
+        //     setError('Todos los campos son obligatorios para realizar el registro.');
+        //     return;
+        // }
+        if(!category){
+            setError('Por favor, selecciona una categoría para el producto.');
             return;
         }
+        if(!name){
+            setError('Por favor, ingresa el nombre del producto.');
+            return;
+        }
+        if(!cost){
+            setError('Por favor, ingresa el costo del producto.');
+            return;
+        }
+        if(!grams){
+            setError('Por favor, ingresa los gramos del producto.');
+            return;
+        }
+        if(!description){
+            setError('Por favor, ingresa la descripción del producto.');
+            return;
+        }
+        if(!brand){
+            setError('Por favor, selecciona una marca para el producto.');
+            return;
+        }
+
+
+
         if (isNaN(cost) || isNaN(grams)) {
             setError('El costo y los gramos deben ser solo valores numéricos.');
             return;
@@ -127,13 +154,17 @@ const AddProduct = () => {
                     <form className="space-y-4" onSubmit={handleSubmit}>
                         <label htmlFor="category" className="block font-medium">Categoría</label>
                         <div className='flex items-center space-x-2'>
-                            <select className="p-2 mt-1 block w-7/12 rounded-md bg-boneWhite shadow-sm focus:ring-2">
-                                <option value="">Selecciona una categoría</option>
-                                {categories.map((category) => (
-                                <option key={category.id} value={category.name}>
-                                    {category.name}
-                                </option>
-                                ))}
+                            <select
+                                    value={category}
+                                    onChange={(e) => setCategory(e.target.value)}
+                                    className="p-2 mt-1 block w-7/12 rounded-md bg-boneWhite shadow-sm focus:ring-2"
+                                >
+                                    <option value="">Selecciona una categoría</option>
+                                    {categories.map((category) => (
+                                        <option key={category.id} value={category.name}>
+                                            {category.name}
+                                        </option>
+                                    ))}
                             </select>
                             <button 
                                 type='button'
@@ -181,19 +212,24 @@ const AddProduct = () => {
                             >
                                 <option value="g">g</option>
                                 <option value="kg">kg</option>
+                                <option value="ml">ml</option>
                             </select>
                         </div>
 
                         <label htmlFor="brand" className="block font-medium">Marca</label>
                         <div className='flex items-center space-x-2'>
-                        <select className="p-2 mt-1 block w-7/12 rounded-md bg-boneWhite shadow-sm focus:ring-2">
-                            <option value="">Selecciona una marca</option>
-                            {brands.map((brand) => (
-                            <option key={brand.id} value={brand.name}>
-                                {brand.name}
-                            </option>
-                            ))}
-                        </select>
+                            <select
+                                value={brand}
+                                onChange={(e) => setBrand(e.target.value)}
+                                className="p-2 mt-1 block w-7/12 rounded-md bg-boneWhite shadow-sm focus:ring-2"
+                            >
+                                <option value="">Selecciona una marca</option>
+                                {brands.map((brand) => (
+                                    <option key={brand.id} value={brand.name}>
+                                        {brand.name}
+                                    </option>
+                                ))}
+                            </select>
                             <button 
                                 type='button'
                                 onClick={() => setIsModalBrand(true)}
