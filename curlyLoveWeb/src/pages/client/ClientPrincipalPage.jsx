@@ -14,7 +14,9 @@ const ClientPrincipalPage = () => {
   const [category, setCategory] = useState('');
   const [categories, setCategories] = useState([]);
   const [products, setProducts] = useState([]);
+  const [cost, setCost] = useState('');
   const [searchTerm, setSearchTerm] = useState('');
+
 
   // categories collection
   useEffect(() => {
@@ -40,9 +42,10 @@ const ClientPrincipalPage = () => {
     return () => unsubscribe(); 
   }, []);
 
-  // Filter products by category and search term
+  // Filter products by category or search term or cost
   const filteredProducts = products.filter(product =>
-    (category === '' || product.category === category) && 
+    (category === '' || product.category === category) &&
+    (cost === '' || product.cost === cost) &&
     product.name.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
@@ -56,7 +59,7 @@ const ClientPrincipalPage = () => {
       <Navbar className="fixed top-0 left-0 w-full z-50" />
       <div className="flex-col mt-36 items-center justify-center min-h-screen ">
         <div className="w-9/12 mx-auto">
-          <div className="flex space-x-40 p-4 rounded-lg ">
+          <div className="flex space-x-20 p-4 rounded-lg ">
             {/* search input */}
             <div className="relative flex items-center w-3/12 ml-8 z-10">
               <input
@@ -76,13 +79,26 @@ const ClientPrincipalPage = () => {
             <select
                 value={category} 
                 onChange={(e) => setCategory(e.target.value)} 
-                className="p-2 mt-1 block w-7/12 rounded-lg border border-boneWhite  focus:ring-2 focus:ring-[#25A59A] outline-none"
+                className="p-2 mt-1 block rounded-lg border border-boneWhite  focus:ring-2 focus:ring-[#25A59A] outline-none"
                 
             >
                 <option value="">Selecciona una categoría</option>
                 {categories.map((category) => (
                     <option key={category.id} value={category.name}>
                         {category.name}
+                    </option>
+                ))}
+            </select>
+            {/* cost products */}
+            <select
+                value={cost} 
+                onChange={(e) => setCost(e.target.value)} 
+                className="p-2 mt-1 block rounded-lg border border-boneWhite  focus:ring-2 focus:ring-[#25A59A] outline-none"
+            >
+                <option value="">Selecciona el costo del producto</option>
+                {products.map((product) => (
+                    <option key={product.id} value={product.cost}>
+                        {product.cost}
                     </option>
                 ))}
             </select>
@@ -93,15 +109,15 @@ const ClientPrincipalPage = () => {
                 {filteredProducts.map((product) => (
                     <div 
                       key={product.id} 
-                      className="border p-4 rounded-lg cursor-pointer hover:shadow-lg"
+                      className="border px-4 pt-4 pb-2 rounded-lg cursor-pointer shadow-lg hover:shadow-xl"
                       onClick={() => handleProductClick(product.name)}
                     >
                       <img src={product.image} alt={product.name} className="w-32 h-32 object-cover m-auto rounded-full" />
-                      <div className='flex items-center'>
+                      <div className='flex-col items-center'>
                         <h3 className="text-base font-bold">Nombre: </h3>
-                        <p className='ml-2'>{product.name}</p>
+                        <p className='text-base'>{product.name}</p>
                       </div>
-                      <div className='flex items-center'>
+                      <div className='flex'>
                         <h3 className="text-base font-bold">Precio: </h3>
                         <p className="ml-2">{product.cost}</p>
                       </div>
